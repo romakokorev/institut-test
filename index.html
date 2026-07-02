@@ -359,8 +359,18 @@ function sendToWebhook() {
     time:userData.time||'', cost:userData.cost||'',
     plans:userData.plans||'', activity:userData.activity||''
   };
-  fetch(WEBHOOK_URL,{method:'POST',body:JSON.stringify(payload)})
-  .then(function(){console.log('Webhook sent')}).catch(function(e){console.error('Webhook error:',e)});
+  var body = JSON.stringify(payload);
+  // text/plain — без CORS preflight, иначе Google Apps Script из iframe падает с NetworkError
+  fetch(WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: body,
+    keepalive: true
+  }).then(function(r) {
+    console.log('Webhook sent', r.status);
+  }).catch(function() {
+    try { navigator.sendBeacon(WEBHOOK_URL, body); } catch (e) {}
+  });
 }
 </script>
 </body>
