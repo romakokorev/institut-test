@@ -75,16 +75,6 @@ h1,h2,h3,h4{font-family:'Cormorant Garamond',Georgia,serif}
 .hidden{display:none}
 .form-screen{padding-bottom:48px}
 </style>
-<!-- Yandex.Metrika counter -->
-<script type="text/javascript">
-  (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-  m[i].l=1*new Date();
-  for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
-  k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-  (window,document,'script','https://mc.yandex.ru/metrika/tag.js','ym');
-  ym(106355825,'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
-</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/106355825" style="position:absolute;left:-9999px" alt=""></div></noscript>
 </head>
 <body>
 
@@ -162,6 +152,7 @@ if (window.parent !== window) {
 var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyuVbErLKbXcDLcNeR73ItILdlxT7CcVEOxFSs7KRcQcxbwlAf9iMM_O9ZxnVX9rP6u/exec';
 var YM_COUNTER_ID = 106355825;
 var YM_GOAL_CONFIRM = 'confirm';
+var YM_PARENT_ORIGINS = ['https://institut-vrn.ru', 'https://www.institut-vrn.ru'];
 var BOTS = { tg:'https://t.me/tochka_intensive_bot', vk:'https://vk.com/institut_vrn', wa:'' };
 // Ссылки BotHelp (+ quiz_uid в кастомное поле подписчика)
 var BOTHELP_TG = 'https://r.bothelp.io/tg?domain=tochka_intensive_bot&start=c1779878912613-ds';
@@ -340,6 +331,13 @@ function submitForm() {
 }
 
 function trackMetrikaGoal(goal) {
+  var msg = { type: 'metrika_reachGoal', counterId: YM_COUNTER_ID, goal: goal };
+  if (window.parent && window.parent !== window) {
+    for (var i = 0; i < YM_PARENT_ORIGINS.length; i++) {
+      try { window.parent.postMessage(msg, YM_PARENT_ORIGINS[i]); } catch (e) {}
+    }
+    return;
+  }
   if (typeof ym === 'function') {
     ym(YM_COUNTER_ID, 'reachGoal', goal);
   }
